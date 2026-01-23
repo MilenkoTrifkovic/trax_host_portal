@@ -1,0 +1,56 @@
+import 'package:flutter/material.dart';
+import 'package:trax_host_portal/helper/app_padding.dart';
+import 'package:trax_host_portal/models/event.dart';
+import 'package:trax_host_portal/models/venue.dart';
+import 'package:trax_host_portal/theme/app_colors.dart';
+import 'package:trax_host_portal/theme/app_font_weight.dart';
+import 'package:trax_host_portal/theme/styled_app_text.dart';
+import 'package:trax_host_portal/utils/enums/sizes.dart';
+
+class SecondSection extends StatelessWidget {
+  final Venue venue;
+  final Event event;
+
+  const SecondSection({
+    super.key,
+    required this.event,
+    required this.venue,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: AppPadding.all(context, paddingType: Sizes.xs),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Row(
+            children: [
+              Icon(
+                Icons.location_on_outlined,
+                size: 16,
+                color: AppColors.textMuted,
+              ),
+              AppText.styledBodyMedium(
+                context,
+                'Location',
+                weight: AppFontWeight.semiBold,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ),
+          AppText.styledBodyMedium(
+            context,
+            color: AppColors.textMuted,
+            venue.fullAddress,
+            weight: AppFontWeight.regular,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
+      ),
+    );
+  }
+}

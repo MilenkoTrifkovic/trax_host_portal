@@ -1,0 +1,114 @@
+import 'package:flutter/material.dart';
+import 'package:trax_host_portal/helper/app_padding.dart';
+import 'package:trax_host_portal/helper/app_spacing.dart';
+import 'package:trax_host_portal/models/event.dart';
+import 'package:trax_host_portal/theme/app_colors.dart';
+import 'package:trax_host_portal/theme/styled_app_text.dart';
+import 'package:trax_host_portal/utils/enums/sizes.dart';
+import 'package:trax_host_portal/utils/navigation/app_routes.dart';
+import 'package:trax_host_portal/utils/navigation/routes.dart';
+import 'package:trax_host_portal/utils/styled_buttons/styled_text_button.dart';
+import 'package:trax_host_portal/widgets/dialogs/dialogs.dart';
+
+class EventSetupSection extends StatelessWidget {
+  final Event event;
+  const EventSetupSection({super.key, required this.event});
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final double maxWidth = constraints.maxWidth;
+        final int columns = maxWidth >= 1000 ? 3 : (maxWidth >= 600 ? 2 : 1);
+        final double spacing = AppSpacing.sm(context);
+        final double itemWidth = (maxWidth - (columns - 1) * spacing) / columns;
+        List<Widget> widgets = [
+          _buildWidgetItem(
+            context,
+            itemWidth,
+            Icons.menu,
+            'Menus',
+            '',
+            () {
+              pushAndRemoveAllRoute(AppRoute.eventMenus, context,
+                  extra: event, urlParam: event.eventId);
+            },
+          ),
+          _buildWidgetItem(
+              context, itemWidth, Icons.question_mark, 'Questions', '', () {
+            pushAndRemoveAllRoute(AppRoute.eventQuestions, context);
+          }),
+          _buildWidgetItem(context, itemWidth, Icons.people, 'Guests', '', () {
+            pushAndRemoveAllRoute(AppRoute.eventGuests, context,
+                urlParam: event.eventId);
+          }),
+          _buildWidgetItem(
+            context,
+            itemWidth,
+            Icons.question_answer,
+            'Responses',
+            '',
+            () {
+              pushAndRemoveAllRoute(AppRoute.eventResponses, context,
+                  urlParam: event.eventId);
+            },
+          )
+        ];
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Wrap(
+              alignment: WrapAlignment.start,
+              spacing: spacing,
+              children: widgets,
+            ),
+            StyledTextButton(
+                onPressed: () {
+                  Dialogs.showConfirmationDialog(
+                      context,
+                      "After Finalizing, Menus and Questions will be locked for editing.",
+                      () {});
+                },
+                text: 'Finalize Menus and Questions')
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildWidgetItem(BuildContext context, double width, IconData icon,
+      String label, String value,
+      [VoidCallback? onPressed]) {
+    return Padding(
+      padding: AppPadding.vertical(context, paddingType: Sizes.sm),
+      child: Card(
+        margin: EdgeInsets.zero,
+        elevation: 4,
+        child: InkWell(
+          onTap: onPressed,
+          child: SizedBox(
+            width: width,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Icon(icon, size: 60),
+                AppSpacing.horizontalXs(context),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    AppText.styledBodyLarge(context, label,
+                        weight: FontWeight.bold,
+                        color: AppColors.onBackground(context)),
+                    const SizedBox(height: 4),
+                    AppText.styledBodyMedium(context, value),
+                  ],
+                ),
+                const Spacer(),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
