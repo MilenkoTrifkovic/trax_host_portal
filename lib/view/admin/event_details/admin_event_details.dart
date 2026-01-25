@@ -229,7 +229,8 @@ class DemographicQuestionsPanelBody extends StatelessWidget {
               const SizedBox(height: 16),
               ElevatedButton.icon(
                 onPressed: () {
-                  context.push(AppRoute.hostQuestionSets.path);
+                  // Question sets management has been removed from host portal
+                  // context.push(AppRoute.hostQuestionSets.path);
                 },
                 icon: const Icon(Icons.add),
                 label: const Text("Create Demographic Questions"),
@@ -312,7 +313,8 @@ class DemographicQuestionsPanelBody extends StatelessWidget {
                 ),
                 TextButton.icon(
                   onPressed: () {
-                    context.push(AppRoute.hostQuestionSets.path);
+                    // Question sets management has been removed from host portal
+                    // context.push(AppRoute.hostQuestionSets.path);
                   },
                   icon: const Icon(Icons.settings, size: 18),
                   label: const Text('Manage Sets'),
@@ -503,7 +505,7 @@ class _DemographicSetPickerDialogState
     });
 
     // Helper: fetch questions using a specific field name
-    Future<List<_PreviewQuestion>> _fetchBy({
+    Future<List<_PreviewQuestion>> fetchBy({
       required String fieldName,
       required String value,
     }) async {
@@ -541,7 +543,7 @@ class _DemographicSetPickerDialogState
     try {
       debugPrint('🔎 Preview: loading questions for setId="$cleanId"');
 
-      List<_PreviewQuestion> list = await _fetchBy(
+      List<_PreviewQuestion> list = await fetchBy(
         fieldName: 'questionSetId',
         value: cleanId,
       );
@@ -561,7 +563,7 @@ class _DemographicSetPickerDialogState
             debugPrint(
               'ℹ️ Preview: 0 questions for "$cleanId". Retrying with set docId="$docId".',
             );
-            list = await _fetchBy(fieldName: 'questionSetId', value: docId);
+            list = await fetchBy(fieldName: 'questionSetId', value: docId);
           }
         }
       }
@@ -576,7 +578,7 @@ class _DemographicSetPickerDialogState
 
         for (final f in fallbacks) {
           debugPrint('ℹ️ Preview: retrying using "$f" == "$cleanId"');
-          final alt = await _fetchBy(fieldName: f, value: cleanId);
+          final alt = await fetchBy(fieldName: f, value: cleanId);
           if (alt.isNotEmpty) {
             list = alt;
             break;
@@ -1432,7 +1434,7 @@ class MenuSelectionCard extends StatelessWidget {
   double _priceOf(MenuItem item) {
     final p = item.price;
     if (p == null) return 0.0;
-    if (p is num) return p.toDouble();
+    return p.toDouble();
     return double.tryParse(p.toString()) ?? 0.0;
   }
 
@@ -1647,9 +1649,7 @@ class MenuSelectionCard extends StatelessWidget {
     final price = item.price;
     final double p = (price == null)
         ? 0.0
-        : (price is num
-            ? price.toDouble()
-            : double.tryParse(price.toString()) ?? 0.0);
+        : (price.toDouble());
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
@@ -1882,7 +1882,7 @@ class _MenuAndItemsDialogState extends State<MenuAndItemsDialog> {
   final TextEditingController _leftSearchCtrl = TextEditingController();
   final TextEditingController _rightSearchCtrl = TextEditingController();
 
-  String _leftSearch = '';
+  final String _leftSearch = '';
   String _rightSearch = '';
 
   String? _leftCategory; // label (not key)
@@ -2036,7 +2036,7 @@ class _MenuAndItemsDialogState extends State<MenuAndItemsDialog> {
   double _priceOf(MenuItem item) {
     final p = item.price;
     if (p == null) return 0.0;
-    if (p is num) return p.toDouble();
+    return p.toDouble();
     return double.tryParse(p.toString()) ?? 0.0;
   }
 
@@ -2357,7 +2357,7 @@ class _MenuAndItemsDialogState extends State<MenuAndItemsDialog> {
 
         if (isEdit) {
           _groups = _groups.map((g) {
-            if (g.groupId != existing!.groupId) return g;
+            if (g.groupId != existing.groupId) return g;
             return g.copyWith(name: res.name, itemIds: res.itemIds);
           }).toList();
         } else {
@@ -2771,7 +2771,7 @@ class _MenuAndItemsDialogState extends State<MenuAndItemsDialog> {
             SizedBox(
               width: 260,
               child: DropdownButtonFormField<String?>(
-                value: _rightCategory,
+                initialValue: _rightCategory,
                 hint: Text('Category', style: GoogleFonts.poppins()),
                 items: [
                   DropdownMenuItem<String?>(
@@ -3069,8 +3069,9 @@ class _MenuAndItemsDialogState extends State<MenuAndItemsDialog> {
                                       );
                                       if (mounted) Navigator.of(context).pop();
                                     } finally {
-                                      if (mounted)
+                                      if (mounted) {
                                         setState(() => _saving = false);
+                                      }
                                     }
                                   },
                             style: ElevatedButton.styleFrom(
@@ -3678,7 +3679,7 @@ class _EventAnalyzerCardState extends State<EventAnalyzerCard> {
   Map<String, dynamic>? _data;
   DateTime? _loadedAt;
 
-  bool _showAllMenu = false;
+  final bool _showAllMenu = false;
 
   @override
   void initState() {
@@ -3703,8 +3704,8 @@ class _EventAnalyzerCardState extends State<EventAnalyzerCard> {
   List<Map<String, dynamic>> _asMapList(dynamic v) {
     if (v is List) {
       return v
-          .where((e) => e is Map)
-          .map((e) => Map<String, dynamic>.from(e as Map))
+          .whereType<Map>()
+          .map((e) => Map<String, dynamic>.from(e))
           .toList();
     }
     return <Map<String, dynamic>>[];

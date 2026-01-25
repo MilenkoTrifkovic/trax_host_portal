@@ -107,7 +107,7 @@ class MobileFilterLayout extends StatelessWidget {
                 value: type,
                 child: AppText.styledBodyMedium(context, type),
               );
-            }).toList(),
+            }),
           ],
           onChanged: (value) {
             filterController.updateEventType(value);

@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:trax_host_portal/controller/auth_controller/auth_controller.dart';
 import 'package:trax_host_portal/controller/auth_controller/sign_in_controller.dart';
 import 'package:trax_host_portal/utils/navigation/app_routes.dart';
 import 'package:trax_host_portal/utils/navigation/routes.dart';
 import 'package:trax_host_portal/controller/global_controllers/snackbar_message_controller.dart';
 import 'package:trax_host_portal/view/authentication/login/widgets/sign_in_header.dart';
 import 'package:trax_host_portal/view/authentication/login/widgets/sign_in_form.dart';
-import 'package:trax_host_portal/view/authentication/login/widgets/sign_in_toggle.dart';
 
-//TODO: UI should be redefined for this screen
+/// Host Portal Sign In Screen
+/// Only host users can log in to this portal
 class SignInScreenWidget extends StatefulWidget {
   const SignInScreenWidget({super.key});
 
@@ -21,15 +20,12 @@ class _SignInScreenWidgetState extends State<SignInScreenWidget> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  final _confirmPasswordController = TextEditingController();
-  final AuthController authController = Get.find<AuthController>();
   late final SnackbarMessageController snackbarController;
 
   @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
-    _confirmPasswordController.dispose();
     super.dispose();
   }
 
@@ -39,7 +35,7 @@ class _SignInScreenWidgetState extends State<SignInScreenWidget> {
     snackbarController = Get.find<SnackbarMessageController>();
   }
 
-  Future<void> _handleEmailPasswordAuth(SignInController controller) async {
+  Future<void> _handleSignIn(SignInController controller) async {
     if (!_formKey.currentState!.validate()) return;
 
     await controller.handleEmailPasswordAuth(
@@ -52,21 +48,11 @@ class _SignInScreenWidgetState extends State<SignInScreenWidget> {
     await controller.handleForgotPassword(_emailController.text.trim());
   }
 
-  void _clearFormAndToggleMode(SignInController controller) {
-    controller.toggleSignUpMode();
-    // Clear form when switching modes
-    _emailController.clear();
-    _passwordController.clear();
-    _confirmPasswordController.clear();
-  }
-
   @override
   Widget build(BuildContext context) {
-    // Initialize the controller
-  final controller = Get.put(SignInController());
+    final controller = Get.put(SignInController());
 
-  // Setup listeners for messages and navigation
-  _setupListeners(controller, context);
+    _setupListeners(controller, context);
 
     return SingleChildScrollView(
       child: SizedBox(
@@ -89,15 +75,8 @@ class _SignInScreenWidgetState extends State<SignInScreenWidget> {
                   formKey: _formKey,
                   emailController: _emailController,
                   passwordController: _passwordController,
-                  confirmPasswordController: _confirmPasswordController,
-                  onSubmit: () => _handleEmailPasswordAuth(controller),
+                  onSubmit: () => _handleSignIn(controller),
                   onForgotPassword: () => _handleForgotPassword(controller),
-                ),
-
-                // Toggle Section
-                SignInToggle(
-                  controller: controller,
-                  onToggle: () => _clearFormAndToggleMode(controller),
                 ),
               ],
             ),
@@ -108,9 +87,7 @@ class _SignInScreenWidgetState extends State<SignInScreenWidget> {
   }
 
   /// Setup all GetX listeners for messages and navigation
-  /// Setup all GetX listeners for messages and navigation
   void _setupListeners(SignInController controller, BuildContext context) {
-  // use snackbarController initialized in initState
     // Watch for success messages
     ever(controller.successMessage, (String? message) {
       if (message != null && message.isNotEmpty) {
@@ -131,7 +108,7 @@ class _SignInScreenWidgetState extends State<SignInScreenWidget> {
       }
     });
 
-    // 🔥 Go to email verification after signup / signin (if not verified)
+    // Navigate to email verification if not verified
     ever(controller.shouldNavigateToEmailVerification, (bool shouldNavigate) {
       if (shouldNavigate) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -142,32 +119,7 @@ class _SignInScreenWidgetState extends State<SignInScreenWidget> {
       }
     });
 
-    // 🔥 Go to organisation info after verified signin but no org
-    ever(controller.shouldNavigateToOrganisationInfo, (bool shouldNavigate) {
-      if (shouldNavigate) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          print('UI: Navigating to organisation info form');
-          pushAndRemoveAllRoute(
-            AppRoute.hostOrganisationInfoForm,
-            context,
-          );
-          controller.clearNavigationFlags();
-        });
-      }
-    });
-
-    // 🔥 Go directly to host events when verified + has org
-    ever(controller.shouldNavigateToHostEvents, (bool shouldNavigate) {
-      if (shouldNavigate) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          print('UI: Navigating to host events');
-          pushAndRemoveAllRoute(AppRoute.hostEvents, context);
-          controller.clearNavigationFlags();
-        });
-      }
-    });
-
-    // 🔥 Go to host person portal for host role users
+    // Navigate to host person portal for verified host users
     ever(controller.shouldNavigateToHostPerson, (bool shouldNavigate) {
       if (shouldNavigate) {
         WidgetsBinding.instance.addPostFrameCallback((_) {

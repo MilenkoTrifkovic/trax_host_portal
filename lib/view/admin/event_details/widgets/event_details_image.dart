@@ -118,7 +118,7 @@ class EventImage extends StatelessWidget {
                       onPressed: () {
                         try {
                           controller.uploadEventImage(event, onUpdate);
-                        } on Exception catch (e) {
+                        } on Exception {
                           // TODO
                         }
                         // TODO: Add edit functionality

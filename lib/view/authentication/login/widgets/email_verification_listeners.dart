@@ -45,7 +45,8 @@ class EmailVerificationListeners extends StatelessWidget {
     ever(controller.shouldNavigateToHostEvents, (bool shouldNavigate) {
       if (shouldNavigate) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          pushAndRemoveAllRoute(AppRoute.hostOrganisationInfoForm, context);
+          // Navigate to host person events page
+          pushAndRemoveAllRoute(AppRoute.hostPersonEvents, context);
           controller.clearNavigationFlags();
         });
       }

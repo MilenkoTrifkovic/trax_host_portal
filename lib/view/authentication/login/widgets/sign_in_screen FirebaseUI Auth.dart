@@ -27,7 +27,8 @@ class SignInScreenWidget extends StatelessWidget {
             if (user != null && !user.emailVerified) {
               pushAndRemoveAllRoute(AppRoute.emailVerification, context);
             } else {
-              pushAndRemoveAllRoute(AppRoute.hostEvents, context);
+              // Navigate to host person events page
+              pushAndRemoveAllRoute(AppRoute.hostPersonEvents, context);
             }
           }),
           AuthStateChangeAction<SignedIn>((context, state) async {
@@ -36,7 +37,8 @@ class SignInScreenWidget extends StatelessWidget {
             if (user != null && !user.emailVerified) {
               pushAndRemoveAllRoute(AppRoute.emailVerification, context);
             } else {
-              pushAndRemoveAllRoute(AppRoute.hostEvents, context);
+              // Navigate to host person events page
+              pushAndRemoveAllRoute(AppRoute.hostPersonEvents, context);
             }
           }),
         ],

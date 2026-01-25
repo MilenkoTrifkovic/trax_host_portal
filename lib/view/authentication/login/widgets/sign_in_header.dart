@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:trax_host_portal/controller/auth_controller/sign_in_controller.dart';
 import 'package:trax_host_portal/helper/app_padding.dart';
 import 'package:trax_host_portal/theme/constants.dart';
@@ -32,26 +31,22 @@ class SignInHeader extends StatelessWidget {
         ),
 
         // Title
-        Obx(() => Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: Text(
-                controller.isSignUpMode.value
-                    ? "Create your account"
-                    : "Sign in to Trax Events",
-                style: Theme.of(context).textTheme.headlineSmall,
-              ),
-            )),
+        Padding(
+          padding: const EdgeInsets.only(bottom: 8),
+          child: Text(
+            "Host Portal Sign In",
+            style: Theme.of(context).textTheme.headlineSmall,
+          ),
+        ),
 
         // Subtitle
-        Obx(() => Padding(
-              padding: const EdgeInsets.only(bottom: 32),
-              child: Text(
-                controller.isSignUpMode.value
-                    ? "Start organizing amazing events today"
-                    : "Welcome back! Please enter your details.",
-                style: Theme.of(context).textTheme.bodySmall,
-              ),
-            )),
+        Padding(
+          padding: const EdgeInsets.only(bottom: 32),
+          child: Text(
+            "Welcome back! Please enter your details.",
+            style: Theme.of(context).textTheme.bodySmall,
+          ),
+        ),
       ],
     );
   }

@@ -1,5 +1,5 @@
 /// Menu widgets barrel file for easy imports.
-library menu_widgets;
+library;
 
 export 'menu_constants.dart';
 export 'menu_filter_chip.dart';

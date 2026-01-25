@@ -219,8 +219,9 @@ class MenuSelectionController extends GetxController {
 
       // Validate token
       final validation = _guestService.validateInvitation(inv, token);
-      if (!validation.isValid)
+      if (!validation.isValid) {
         throw Exception(validation.error ?? 'Invalid invitation');
+      }
 
       invitation.value = inv;
 

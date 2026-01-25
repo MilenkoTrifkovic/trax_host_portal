@@ -793,8 +793,8 @@ class FirestoreServices {
 
       // ✅ IMPORTANT: do NOT query by email (email can be shared by multiple guests)
       // Use guest.id if you have it, otherwise create a new doc id.
-      final docRef = (guest.id != null && guest.id!.trim().isNotEmpty)
-          ? usersRef.doc(guest.id!.trim())
+      final docRef = (guest.id.trim().isNotEmpty)
+          ? usersRef.doc(guest.id.trim())
           : usersRef.doc();
 
       // (Optional) if guest didn't have an id, store it back locally
@@ -803,9 +803,9 @@ class FirestoreServices {
       await docRef.set({
         'guestId': docRef.id,
         'email': email,
-        if ((guest.name ?? '').trim().isNotEmpty) 'name': guest.name!.trim(),
+        if ((guest.name ?? '').trim().isNotEmpty) 'name': guest.name.trim(),
         'eventIds': FieldValue.arrayUnion([eventId]),
-        if (guest.companions != null) 'companions': guest.companions,
+        'companions': guest.companions,
         'updatedAt': FieldValue.serverTimestamp(),
         'createdAt': FieldValue.serverTimestamp(),
       }, SetOptions(merge: true));
@@ -1756,7 +1756,7 @@ class FirestoreServices {
       final snap = await tx.get(ref);
       if (!snap.exists) throw Exception('Event not found');
 
-      final data = (snap.data() as Map<String, dynamic>? ?? {});
+      final data = (snap.data() ?? {});
       final currentHosts = (data['hostUserIds'] as List<dynamic>? ?? [])
           .map((e) => e.toString().trim())
           .where((e) => e.isNotEmpty)

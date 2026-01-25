@@ -490,8 +490,12 @@ class DemographicResponseController extends GetxController {
     _setLoading();
 
     // Clear previous text controllers
-    for (final c in textControllers.values) c.dispose();
-    for (final c in freeTextControllers.values) c.dispose();
+    for (final c in textControllers.values) {
+      c.dispose();
+    }
+    for (final c in freeTextControllers.values) {
+      c.dispose();
+    }
     textControllers.clear();
     freeTextControllers.clear();
 
@@ -659,8 +663,12 @@ class DemographicResponseController extends GetxController {
   Future<void> loadQuestionsOnly(String qsId) async {
     _setLoading();
 
-    for (final c in textControllers.values) c.dispose();
-    for (final c in freeTextControllers.values) c.dispose();
+    for (final c in textControllers.values) {
+      c.dispose();
+    }
+    for (final c in freeTextControllers.values) {
+      c.dispose();
+    }
     textControllers.clear();
     freeTextControllers.clear();
 
@@ -849,9 +857,10 @@ class DemographicResponseController extends GetxController {
 
         // Otherwise resolve by optionId
         final opt = optionId.isNotEmpty ? findOpt(optionId) : null;
-        if (opt != null)
+        if (opt != null) {
           return optToMap(opt,
               freeText: freeText, requiresFreeTextOverride: requiresFreeText);
+        }
 
         return m;
       }

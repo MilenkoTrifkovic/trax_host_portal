@@ -6,6 +6,7 @@
 /// - Navigation URL builders
 /// - Next step determination logic
 /// - Completion status checking
+library;
 
 /// Represents the current state of response progress for an invitation
 class ResponseFlowState {

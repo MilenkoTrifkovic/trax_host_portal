@@ -11,6 +11,7 @@ import 'package:trax_host_portal/controller/common_controllers/event_list_contro
 import 'package:trax_host_portal/controller/admin_controllers/host_controller.dart';
 import 'package:trax_host_portal/controller/global_controllers/guest_controllers/guest_session_controller.dart';
 import 'package:trax_host_portal/controller/global_controllers/snackbar_message_controller.dart';
+import 'package:trax_host_portal/controller/global_controllers/venues_controller.dart';
 import 'package:trax_host_portal/services/shared_pref_services.dart';
 import 'package:trax_host_portal/services/storage_services.dart';
 import 'package:trax_host_portal/services/cloud_functions_services.dart';
@@ -55,6 +56,7 @@ Future<void> main() async {
       fenix: true);
   Get.lazyPut<EventListController>(() => EventListController(), fenix: true);
   Get.lazyPut<HostController>(() => HostController(), fenix: true);
+  Get.lazyPut<VenuesController>(() => VenuesController(), fenix: true);
 
   Get.put<EventController>(EventController(), permanent: true);
 

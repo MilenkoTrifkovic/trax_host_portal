@@ -10,8 +10,6 @@ import 'package:trax_host_portal/utils/enums/event_status.dart';
 import 'package:trax_host_portal/utils/enums/sizes.dart';
 import 'package:trax_host_portal/utils/navigation/app_routes.dart';
 import 'package:trax_host_portal/view/common/widgets/event_filter_section.dart';
-import 'package:trax_host_portal/view/common/widgets/event_list_header_old.dart';
-import 'package:trax_host_portal/view/common/widgets/list_of_events.dart';
 
 /// A screen that displays a list of events for the host user.
 ///
@@ -261,9 +259,9 @@ class _EventsDataTableState extends State<EventsDataTable> {
     final id = (e.eventId ?? '').trim();
     if (id.isEmpty) return;
 
-    // Works with a path like "/event-details/:eventId"
-    final placeholder = AppRoute.eventDetails.placeholder; // e.g. "eventId"
-    final path = AppRoute.eventDetails.path.replaceFirst(':$placeholder', id);
+    // Admin routes removed - use guest event details
+    final placeholder = AppRoute.guestEventDetails.placeholder; // e.g. "eventId"
+    final path = AppRoute.guestEventDetails.path.replaceFirst(':$placeholder', id);
 
     context.go(path); // requires: import 'package:go_router/go_router.dart';
   }

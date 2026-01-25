@@ -362,7 +362,7 @@ class GuestSessionController extends GetxController {
       }
 
 // Update current guest responses
-      final currentId = _effectiveGuestId(this.guest.value);
+      final currentId = _effectiveGuestId(guest.value);
       if (currentId != null) {
         demographicsResponse.value = groupDemographicsResponses[currentId];
         menuSelectionResponse.value = groupMenuResponses[currentId];

@@ -397,8 +397,9 @@ class _DemographicResponsePageState extends State<DemographicResponsePage> {
 
               // ✅ Submitting overlay (stays above everything)
               Obx(() {
-                if (!_controller.isSubmitting.value)
+                if (!_controller.isSubmitting.value) {
                   return const SizedBox.shrink();
+                }
                 return Positioned.fill(
                   child: Container(
                     color: gfBackground.withOpacity(0.35),

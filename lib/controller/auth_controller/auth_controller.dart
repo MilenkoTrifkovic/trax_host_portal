@@ -29,7 +29,7 @@ class AuthController extends GetxController {
   AuthController()
       : _sharedPrefServices = Get.find<SharedPrefServices>(),
         _firestoreServices = Get.find<FirestoreServices>(),
-        _cloudFunctionsService = Get.find<CloudFunctionsService>() {}
+        _cloudFunctionsService = Get.find<CloudFunctionsService>();
 
   @override
   void onInit() {

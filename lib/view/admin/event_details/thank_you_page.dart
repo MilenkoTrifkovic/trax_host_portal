@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:trax_host_portal/features/guest/rsvp_response/controller/rsvp_response_controller.dart';
 import 'package:trax_host_portal/features/guest/rsvp_response/view/widgets/rsvp_completed_event_details.dart';
 import 'package:trax_host_portal/features/guest/rsvp_response/view/widgets/rsvp_error_widget.dart';

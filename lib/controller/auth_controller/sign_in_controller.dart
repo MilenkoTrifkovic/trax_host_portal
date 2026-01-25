@@ -2,20 +2,16 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:get/get.dart';
 import 'package:trax_host_portal/controller/auth_controller/auth_controller.dart';
 import 'package:trax_host_portal/services/auth_services.dart';
-import 'package:trax_host_portal/services/cloud_functions_services.dart';
 
-/// Controller for managing sign-in and sign-up functionality
+/// Controller for managing host sign-in functionality
+/// Only host users are allowed to log in to this portal
 class SignInController extends GetxController {
   final AuthServices _authServices = AuthServices();
-  final CloudFunctionsService _cloudFunctionsService =
-      Get.find<CloudFunctionsService>();
   final AuthController _authController = Get.find<AuthController>();
 
   // Observables
   var isLoading = false.obs;
-  var isSignUpMode = false.obs;
   var isPasswordVisible = false.obs;
-  var isConfirmPasswordVisible = false.obs;
 
   // Message observables
   var successMessage = RxnString();
@@ -24,29 +20,17 @@ class SignInController extends GetxController {
   // Auth result
   var authResult = Rxn<UserCredential>();
 
-  // 🔥 Navigation flags
+  // Navigation flags
   var shouldNavigateToEmailVerification = false.obs;
-  var shouldNavigateToOrganisationInfo = false.obs;
-  var shouldNavigateToHostEvents = false.obs;
   var shouldNavigateToHostPerson = false.obs;
 
   // ─────────────────────────────────────────────
   // UI toggles
   // ─────────────────────────────────────────────
 
-  /// Toggle between sign-in and sign-up modes
-  void toggleSignUpMode() {
-    isSignUpMode.value = !isSignUpMode.value;
-  }
-
   /// Toggle password visibility
   void togglePasswordVisibility() {
     isPasswordVisible.value = !isPasswordVisible.value;
-  }
-
-  /// Toggle confirm password visibility
-  void toggleConfirmPasswordVisibility() {
-    isConfirmPasswordVisible.value = !isConfirmPasswordVisible.value;
   }
 
   // ─────────────────────────────────────────────
@@ -63,64 +47,34 @@ class SignInController extends GetxController {
       isLoading.value = true;
       _resetNavigationFlags();
 
-      UserCredential userCredential;
+      print('Controller: Signing in host user');
+      final userCredential = await _authServices.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
 
-      if (isSignUpMode.value) {
-        // ───────────── SIGN UP ─────────────
-        // 🚫 DISABLE SIGN UP - Only hosts can access this portal
-        _showErrorMessage('Sign up is not available. Please contact your administrator for access.');
+      await _authController.loadUserProfile();
+      authResult.value = userCredential;
+
+      final currentUser = userCredential.user;
+      final isVerified = currentUser?.emailVerified ?? false;
+
+      // Only allow host users - log out anyone else
+      final userRole = _authController.userRole.value;
+
+      if (userRole?.name != 'host') {
+        print('⛔ User is not a host (role: ${userRole?.name}), logging out');
+        await _authController.logout();
+        _showErrorMessage('Access denied. Only host users are allowed to log in.');
         return;
-        
-        /* Original sign-up code commented out
-        print('Controller: Creating admin user (signup)');
-        userCredential = await _authServices.createUserWithEmailAndPassword(
-          email: email,
-          password: password,
-        );
+      }
 
-        // 1️⃣ send verification email
-        await _authServices.sendEmailVerification();
-
-        // 2️⃣ load profile (role=admin, organisationId=null)
-        await _authController.loadUserProfile();
-
-        authResult.value = userCredential;
-
-        // 3️⃣ tell UI to go to email verification page
+      // Host user - check verification
+      if (!isVerified) {
         shouldNavigateToEmailVerification.value = true;
-        */
       } else {
-        // ───────────── SIGN IN ─────────────
-        print('Controller: Signing in user');
-        userCredential = await _authServices.signInWithEmailAndPassword(
-          email: email,
-          password: password,
-        );
-
-        await _authController.loadUserProfile();
-        authResult.value = userCredential;
-
-        final currentUser = userCredential.user;
-        final isVerified = currentUser?.emailVerified ?? false;
-
-        // 🚫 ONLY ALLOW HOST USERS - Log out anyone else
-        final userRole = _authController.userRole.value;
-        
-        if (userRole?.name != 'host') {
-          // Not a host user - log them out immediately
-          print('⛔ User is not a host (role: ${userRole?.name}), logging out');
-          await _authController.logout();
-          _showErrorMessage('Access denied. Only host users are allowed to log in.');
-          return;
-        }
-
-        // Host user - check verification
-        if (!isVerified) {
-          shouldNavigateToEmailVerification.value = true;
-        } else {
-          // Verified host -> go to host person portal
-          shouldNavigateToHostPerson.value = true;
-        }
+        // Verified host -> go to host person portal
+        shouldNavigateToHostPerson.value = true;
       }
     } catch (e) {
       print('Controller: Error occurred: $e');
@@ -154,9 +108,7 @@ class SignInController extends GetxController {
   // ─────────────────────────────────────────────
 
   void _resetNavigationFlags() {
-    shouldNavigateToHostEvents.value = false;
     shouldNavigateToEmailVerification.value = false;
-    shouldNavigateToOrganisationInfo.value = false;
     shouldNavigateToHostPerson.value = false;
   }
 

@@ -1,59 +1,19 @@
 // Routes definition using enums for better type safety and organization
+// This is the Host Portal - only host users can log in
 enum AppRoute {
   // Base routes
   welcome('/welcome'),
-  signup('/signup'),
   emailVerification('/email-verification'),
 
-  // Host routes
-  host('/host'),
-  hostOrganisationInfoForm('/host-organisation-info-form'),
-  hostEvents('/host-events'),
-  hostRoleSelection('/host-role-selection'),
-  hostVenues('/host-venues'),
-  hostMenus('/host-menus'),
-
-  /// 🔹 NEW: host menu set details
-  hostMenuDetails('/host-menus/:menuId', 'menuId'),
-
-  hostVenueDetails('/host-venue-details/:eventId', 'eventId'),
-  hostQuestionSets('/host-question-sets'),
-  hostSettings('/host-settings'),
-
-  // NEW: questions for a specific set (HostQuestionsScreen)
-  hostQuestionSetQuestions('/host-question-sets/:setId', 'setId'),
-  hostQuestions('/host-questions'),
-  hostCreateEvent('/host-create-event'),
-  adminEventDetails('/host-event-details/:eventId', 'eventId'),
-  hostQuestionRules('/host-question-rules'),
-
-  // Host Person routes (for individual hosts, not admins)
+  // Host Person routes (for individual hosts)
   hostPerson('/host-person'),
   hostPersonEvents('/host-person-event'),
   hostPersonFeed('/host-person-feed'),
-  // hostPersonProfile('/host-person-profile'), // Replaced by feed
 
-  // Guest / event routes ...
+  // Guest / event routes
   guestEvents('/guest-events'),
   guestEventDetails('/guest-event-details/:eventId', 'eventId'),
   guestEventRespond('/guest-event-details/:eventId/respond', 'eventId'),
-  eventDetails('/event-details/:eventId', 'eventId'),
-  eventQuestions('/event-questions'),
-  eventResponses('/event-responses/:eventId/responses', 'eventId'),
-  eventMenus('/guest-event-details/:eventId/event-menus', 'eventId'),
-  eventDemographicAnalyzer(
-      '/event-details/:eventId/demographic-analyzer', 'eventId'),
-  eventMenuAnalyzer('/event-details/:eventId/menu-analyzer', 'eventId'),
-  eventGuests('/event-guests'),
-  guestSidePreview('/event-details/:eventId/guest-preview', 'eventId'),
-
-  // Public guest response routes
-  guestLogin('/guest-login'),
-  guestResponsesPreview('/guest-responses-preview'),
-  guestDemographicsView('/guest-demographics-view'),
-  guestMenuSelectionView('/guest-menu-selection-view'),
-  guestDemographicsEdit('/guest-demographics-edit'),
-  guestMenuSelectionEdit('/guest-menu-selection-edit'),
   guestFeed('/guest-feed'),
   guestResponse('/guest-response'),
   guestCompanions('/guest-companions'),
@@ -62,13 +22,13 @@ enum AppRoute {
   menuSelection('/menu-selection'),
   thankYou('/thank-you'),
 
-// Dev-only host route visible in sidebar
-  // hostDemographics('/host-demographics'),
-
-  // Other
-  aboutView('/about'),
-  contactView('/contact'),
-  calendarView('/calendar');
+  // Public guest response routes
+  guestLogin('/guest-login'),
+  guestResponsesPreview('/guest-responses-preview'),
+  guestDemographicsView('/guest-demographics-view'),
+  guestMenuSelectionView('/guest-menu-selection-view'),
+  guestDemographicsEdit('/guest-demographics-edit'),
+  guestMenuSelectionEdit('/guest-menu-selection-edit');
 
   static AppRoute? fromPath(String path) {
     final clean = path.split('?').first;

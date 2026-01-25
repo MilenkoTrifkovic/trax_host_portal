@@ -67,7 +67,7 @@ class DemographicQuestionCard extends StatelessWidget {
     final out = <Map<String, dynamic>>[];
     for (final item in (answer as List)) {
       if (item is Map) {
-        out.add(Map<String, dynamic>.from(item as Map));
+        out.add(Map<String, dynamic>.from(item));
       } else if (item is String) {
         out.add({'optionId': item});
       }
@@ -194,7 +194,7 @@ class DemographicQuestionCard extends StatelessWidget {
             IgnorePointer(
               ignoring: readOnly,
               child: DropdownButtonFormField<String>(
-                value: selectedId,
+                initialValue: selectedId,
                 isExpanded: true,
                 decoration: InputDecoration(
                   isDense: true,
@@ -463,7 +463,7 @@ class DemographicQuestionCard extends StatelessWidget {
     final optId = (a['optionId'] ?? '').toString().trim();
     if (optId.isEmpty) return const SizedBox.shrink();
 
-    final ctrlKey = '${question.id}__${optId}';
+    final ctrlKey = '${question.id}__$optId';
     final ctrl = getFreeTextController(ctrlKey);
 
     if (ctrl.text.isEmpty && a['freeText'] != null) {

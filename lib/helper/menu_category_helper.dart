@@ -67,7 +67,7 @@ class MenuCategoryHelper {
                 value: category,
                 child: Text(category),
               ))
-          .toList(),
+          ,
     ];
   }
 

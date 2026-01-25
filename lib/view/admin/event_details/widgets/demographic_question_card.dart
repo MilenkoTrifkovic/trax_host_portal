@@ -126,7 +126,7 @@ class DemographicQuestionCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             DropdownButtonFormField<String>(
-              value: selected,
+              initialValue: selected,
               isExpanded: true,
               decoration: InputDecoration(
                 isDense: true,

@@ -567,8 +567,9 @@ class _CreateHostDialogState extends State<CreateHostDialog> {
                             validator: (v) {
                               final s = (v ?? '').trim();
                               if (s.isEmpty) return 'Email is required';
-                              if (!s.contains('@'))
+                              if (!s.contains('@')) {
                                 return 'Enter a valid email';
+                              }
                               return null;
                             },
                           ),
@@ -588,7 +589,7 @@ class _CreateHostDialogState extends State<CreateHostDialog> {
 
                           _label('Country *'),
                           DropdownButtonFormField<String>(
-                            value: _selectedCountry,
+                            initialValue: _selectedCountry,
                             decoration: _decoration(
                               hintText: 'Select country',
                               prefixIcon: const Icon(Icons.public, size: 18),
@@ -601,8 +602,9 @@ class _CreateHostDialogState extends State<CreateHostDialog> {
                                 ? null
                                 : (v) => setState(() => _selectedCountry = v),
                             validator: (v) {
-                              if (v == null || v.trim().isEmpty)
+                              if (v == null || v.trim().isEmpty) {
                                 return 'Country is required';
+                              }
                               return null;
                             },
                           ),
@@ -914,7 +916,7 @@ class _EditHostDialogState extends State<EditHostDialog> {
                           const SizedBox(height: 14),
                           _label('Country *'),
                           DropdownButtonFormField<String>(
-                            value: _selectedCountry,
+                            initialValue: _selectedCountry,
                             decoration: _decoration(
                               hintText: 'Select country',
                               prefixIcon: const Icon(Icons.public, size: 18),

@@ -46,8 +46,8 @@ class _EventDemographicAnalyzerPageState
   List<Map<String, dynamic>> _asMapList(dynamic v) {
     if (v is List) {
       return v
-          .where((e) => e is Map)
-          .map((e) => Map<String, dynamic>.from(e as Map))
+          .whereType<Map>()
+          .map((e) => Map<String, dynamic>.from(e))
           .toList();
     }
     return <Map<String, dynamic>>[];
