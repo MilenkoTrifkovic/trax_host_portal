@@ -402,8 +402,9 @@ class AdminGuestListController extends GetxController {
       final invitationCode =
           eventsController.getInvitationCodeByEventId(eventId);
 
-      final callable =
-          FirebaseFunctions.instance.httpsCallable('sendInvitations');
+      // ✅ Use the host-specific cloud function
+      final callable = FirebaseFunctions.instance
+          .httpsCallable('sendInvitationForEventFromHost');
 
       final res = await callable.call({
         'eventId': eventId,
@@ -434,15 +435,8 @@ class AdminGuestListController extends GetxController {
       final status = (first['status'] ?? '').toString();
 
       if (status == 'sent') {
-        await FirebaseFirestore.instance
-            .collection('guests')
-            .doc(guestId)
-            .update({
-          'isInvited': true,
-          'modifiedAt': FieldValue.serverTimestamp(),
-          'lastInvitedAt': FieldValue.serverTimestamp(),
-          'inviteSentCount': FieldValue.increment(1),
-        });
+        // ✅ Guest document update is now handled by the Cloud Function
+        // No client-side Firestore update needed (avoids permission issues)
         return true;
       }
 
@@ -498,8 +492,9 @@ class AdminGuestListController extends GetxController {
       final invitationCode =
           eventsController.getInvitationCodeByEventId(eventId);
 
-      final callable =
-          FirebaseFunctions.instance.httpsCallable('sendInvitations');
+      // ✅ Use the host-specific cloud function
+      final callable = FirebaseFunctions.instance
+          .httpsCallable('sendInvitationForEventFromHost');
 
       final res = await callable.call({
         'eventId': eventId,
@@ -513,30 +508,12 @@ class AdminGuestListController extends GetxController {
       final data = Map<String, dynamic>.from(res.data as Map);
       final results = (data['results'] as List?) ?? [];
 
-      // ✅ Collect guestIds that were successfully sent
-      final sentGuestIds = results
-          .where((r) => r is Map && r['status'] == 'sent')
-          .map((r) => (r['guestId'] ?? '').toString().trim())
-          .where((id) => id.isNotEmpty)
-          .toSet();
+      // ✅ Guest documents are updated by the Cloud Function now
+      // No client-side batch update needed
+      final sentCount =
+          results.where((r) => r is Map && r['status'] == 'sent').length;
 
-      if (sentGuestIds.isEmpty) return 0;
-
-      final batch = FirebaseFirestore.instance.batch();
-      int count = 0;
-
-      for (final id in sentGuestIds) {
-        batch.update(FirebaseFirestore.instance.collection('guests').doc(id), {
-          'isInvited': true,
-          'modifiedAt': FieldValue.serverTimestamp(),
-          'lastInvitedAt': FieldValue.serverTimestamp(),
-          'inviteSentCount': FieldValue.increment(1),
-        });
-        count++;
-      }
-
-      await batch.commit();
-      return count;
+      return sentCount;
     } catch (e, st) {
       debugPrint('inviteAllGuests error: $e\n$st');
       return 0;

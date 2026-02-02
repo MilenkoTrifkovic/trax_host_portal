@@ -7,6 +7,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:trax_host_portal/controller/admin_controllers/admin_event_details_controllers/admin_event_details_controller.dart';
 import 'package:trax_host_portal/controller/admin_controllers/event_hosts_controller.dart';
+import 'package:trax_host_portal/controller/global_controllers/events_controller.dart';
 import 'package:trax_host_portal/features/admin/admin_guests_management/view/admin_guest_list.dart';
 import 'package:trax_host_portal/models/event.dart';
 import 'package:trax_host_portal/models/menu_item.dart';
@@ -47,6 +48,11 @@ class _AdminEventDetailsState extends State<AdminEventDetails> {
   @override
   void initState() {
     super.initState();
+
+    // Register EventsController if not already registered
+    if (!Get.isRegistered<EventsController>()) {
+      Get.put(EventsController());
+    }
 
     Get.put(AdminGuestListController());
     controller = AdminEventDetailsController();
@@ -1598,18 +1604,15 @@ class MenuSelectionCard extends StatelessWidget {
               const SizedBox(height: 10),
               ConstrainedBox(
                 constraints: BoxConstraints(maxHeight: listMaxHeight),
-                child: Scrollbar(
-                  thumbVisibility: true,
-                  child: ListView.separated(
-                    itemCount: selectedItems.length,
-                    separatorBuilder: (_, __) => const SizedBox(height: 8),
-                    itemBuilder: (_, idx) {
-                      final it = selectedItems[idx];
-                      final id = (it.menuItemId ?? '').trim();
-                      final groupName = groupNameByItemId[id];
-                      return _selectedDishRow(it, groupName: groupName);
-                    },
-                  ),
+                child: ListView.separated(
+                  itemCount: selectedItems.length,
+                  separatorBuilder: (_, __) => const SizedBox(height: 8),
+                  itemBuilder: (_, idx) {
+                    final it = selectedItems[idx];
+                    final id = (it.menuItemId ?? '').trim();
+                    final groupName = groupNameByItemId[id];
+                    return _selectedDishRow(it, groupName: groupName);
+                  },
                 ),
               ),
               const SizedBox(height: 12),
@@ -1647,9 +1650,7 @@ class MenuSelectionCard extends StatelessWidget {
     final bool isVeg = ftLabel.toLowerCase() == 'veg' || _isVegByCategory(item);
 
     final price = item.price;
-    final double p = (price == null)
-        ? 0.0
-        : (price.toDouble());
+    final double p = (price == null) ? 0.0 : (price.toDouble());
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),

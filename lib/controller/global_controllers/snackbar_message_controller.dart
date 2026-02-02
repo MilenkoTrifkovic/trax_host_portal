@@ -15,15 +15,20 @@ class SnackbarMessageController extends GetxController {
     message.value = null;
   }
 
+  /// Safely shows a snackbar, handling cases where no Scaffold is attached
+  void _showSnackBar(SnackBar snackBar) {
+    try {
+      rootScaffoldMessengerKey.currentState?.showSnackBar(snackBar);
+    } catch (e) {
+      // ScaffoldMessenger exists but no Scaffolds are attached (e.g., during navigation)
+      debugPrint('Could not show snackbar: $e');
+    }
+  }
+
   /// Shows a success message
   void showSuccessMessage(String text) {
-    // message.value = SnackBarMessage(
-    //   message: text,
-    //   type: SnackBarType.success,
-    // );
-    rootScaffoldMessengerKey.currentState?.showSnackBar(
+    _showSnackBar(
       SnackBar(
-
         content: AppText.styledBodyMedium(null, text,
             color: AppColors.white, weight: AppFontWeight.semiBold),
         backgroundColor: AppColors.success,
@@ -38,13 +43,7 @@ class SnackbarMessageController extends GetxController {
 
   /// Shows an error message (styled the same as success but with error color)
   void showErrorMessage(String text) {
-    // // keep the reactive message as well for any listeners
-    // message.value = SnackBarMessage(
-    //   message: text,
-    //   type: SnackBarType.error,
-    // );
-
-    rootScaffoldMessengerKey.currentState?.showSnackBar(
+    _showSnackBar(
       SnackBar(
         content: AppText.styledBodyMedium(null, text,
             color: AppColors.white, weight: AppFontWeight.semiBold),
@@ -60,7 +59,7 @@ class SnackbarMessageController extends GetxController {
 
   /// Shows an informational message (neutral color)
   void showInfoMessage(String text) {
-    rootScaffoldMessengerKey.currentState?.showSnackBar(
+    _showSnackBar(
       SnackBar(
         content: AppText.styledBodyMedium(null, text,
             color: AppColors.white, weight: AppFontWeight.semiBold),
