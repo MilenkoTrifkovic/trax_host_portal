@@ -8,6 +8,7 @@ import 'package:intl/intl.dart';
 import 'package:trax_host_portal/controller/admin_controllers/admin_event_details_controllers/admin_event_details_controller.dart';
 import 'package:trax_host_portal/controller/admin_controllers/event_hosts_controller.dart';
 import 'package:trax_host_portal/controller/global_controllers/events_controller.dart';
+import 'package:trax_host_portal/controller/global_controllers/organisation_controller.dart';
 import 'package:trax_host_portal/features/admin/admin_guests_management/view/admin_guest_list.dart';
 import 'package:trax_host_portal/models/event.dart';
 import 'package:trax_host_portal/models/menu_item.dart';
@@ -1441,7 +1442,7 @@ class MenuSelectionCard extends StatelessWidget {
     final p = item.price;
     if (p == null) return 0.0;
     return p.toDouble();
-    return double.tryParse(p.toString()) ?? 0.0;
+    // return double.tryParse(p.toString()) ?? 0.0;
   }
 
   @override
@@ -1453,6 +1454,10 @@ class MenuSelectionCard extends StatelessWidget {
     final listMaxHeight = isPhone ? 280.0 : 340.0;
 
     return Obx(() {
+      // ✅ global org flag (realtime)
+      final orgCtrl = Get.find<OrganisationController>();
+      final showPrices = orgCtrl.showMenuItemPrices.value;
+
       final selectedIds = controller.selectedMenuItemIds.toList();
       final selectedItems = controller.selectedMenuItems.toList();
       final groups = controller.menuItemGroups.toList();
@@ -1611,32 +1616,40 @@ class MenuSelectionCard extends StatelessWidget {
                     final it = selectedItems[idx];
                     final id = (it.menuItemId ?? '').trim();
                     final groupName = groupNameByItemId[id];
-                    return _selectedDishRow(it, groupName: groupName);
+                    return _selectedDishRow(
+                      it,
+                      groupName: groupName,
+                      showPrices: showPrices,
+                    );
                   },
                 ),
               ),
-              const SizedBox(height: 12),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    hasGroups ? 'Estimated total' : 'Total',
-                    style: GoogleFonts.poppins(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
+
+              // ✅ Hide totals when prices are hidden
+              if (showPrices) ...[
+                const SizedBox(height: 12),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      hasGroups ? 'Estimated total' : 'Total',
+                      style: GoogleFonts.poppins(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
-                  ),
-                  Text(
-                    showRange
-                        ? '${AppCurrency.format(minTotal)} - ${AppCurrency.format(maxTotal)}'
-                        : AppCurrency.format(maxTotal),
-                    style: GoogleFonts.poppins(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
+                    Text(
+                      showRange
+                          ? '${AppCurrency.format(minTotal)} - ${AppCurrency.format(maxTotal)}'
+                          : AppCurrency.format(maxTotal),
+                      style: GoogleFonts.poppins(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
-                  ),
-                ],
-              ),
+                  ],
+                ),
+              ],
             ],
           ],
         ),
@@ -1644,7 +1657,11 @@ class MenuSelectionCard extends StatelessWidget {
     });
   }
 
-  Widget _selectedDishRow(MenuItem item, {String? groupName}) {
+  Widget _selectedDishRow(
+    MenuItem item, {
+    String? groupName,
+    required bool showPrices,
+  }) {
     final String ftLabel = _foodTypeLabel(item);
     final String catLabel = _categoryLabel(item);
     final bool isVeg = ftLabel.toLowerCase() == 'veg' || _isVegByCategory(item);
@@ -1723,7 +1740,9 @@ class MenuSelectionCard extends StatelessWidget {
                           style: TextStyle(color: Color(0xFFCBD5E1))),
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 3),
+                          horizontal: 8,
+                          vertical: 3,
+                        ),
                         decoration: BoxDecoration(
                           color: Colors.black,
                           borderRadius: BorderRadius.circular(999),
@@ -1743,10 +1762,13 @@ class MenuSelectionCard extends StatelessWidget {
               ],
             ),
           ),
-          Text(
-            AppCurrency.format(p),
-            style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
-          ),
+
+          // ✅ Price hidden based on org toggle
+          if (showPrices)
+            Text(
+              AppCurrency.format(p),
+              style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
+            ),
         ],
       ),
     );

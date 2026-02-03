@@ -21,19 +21,11 @@ class HostPersonEventController extends GetxController {
     fetchHostEvent();
   }
 
-  /// Fetches the event assigned to the current host user
-  /// 
-  /// Process:
-  /// 1. Get current user's UID
-  /// 2. Query events collection where hostUserIds array contains this UID
-  /// 3. Return the first (and only) event found
-  /// 4. Initialize OrganisationController with the event's organisationId
   Future<void> fetchHostEvent() async {
     try {
       isLoading.value = true;
       error.value = '';
 
-      // Get current user
       final User? currentUser = _auth.currentUser;
       if (currentUser == null) {
         throw Exception('No user is currently logged in');
@@ -42,11 +34,10 @@ class HostPersonEventController extends GetxController {
       final String uid = currentUser.uid;
       print('🔍 Fetching event for host user: $uid');
 
-      // Query events where hostUserIds contains the current user's UID
       final QuerySnapshot<Map<String, dynamic>> querySnapshot = await _db
           .collection('events')
           .where('hostUserIds', arrayContains: uid)
-          .limit(1) // Host should only have one event
+          .limit(1)
           .get();
 
       if (querySnapshot.docs.isEmpty) {
@@ -56,21 +47,23 @@ class HostPersonEventController extends GetxController {
         return;
       }
 
-      // Convert Firestore document to Event model
       final doc = querySnapshot.docs.first;
       event.value = Event.fromFirestore(doc);
-      
-      print('✅ Event fetched successfully: ${event.value?.name} (ID: ${event.value?.eventId})');
-      
-      // Initialize OrganisationController with the event's organisationId
-      // This is required for AdminEventDetails to work properly
-      final organisationId = event.value?.organisationId;
-      if (organisationId != null && organisationId.isNotEmpty) {
-        // Check if OrganisationController already exists, if not create it
-        if (!Get.isRegistered<OrganisationController>()) {
-          Get.put(OrganisationController(organisationId));
-          print('✅ OrganisationController initialized with ID: $organisationId');
-        }
+
+      print(
+        '✅ Event fetched successfully: ${event.value?.name} (ID: ${event.value?.eventId})',
+      );
+
+      // ✅ Ensure OrganisationController is created/bound for THIS org
+      final orgId = (event.value?.organisationId ?? '').trim();
+      if (orgId.isNotEmpty) {
+        _ensureOrganisationController(orgId);
+
+        // Optional but useful: wait for initial org load (so event details can use org immediately)
+        final orgCtrl = Get.find<OrganisationController>();
+        await orgCtrl.initRealtime(orgId);
+
+        print('✅ OrganisationController ready for orgId: $orgId');
       }
     } catch (e, stackTrace) {
       print('❌ Error fetching host event: $e');
@@ -82,14 +75,23 @@ class HostPersonEventController extends GetxController {
     }
   }
 
-  /// Refreshes the event data
-  Future<void> refreshEvent() async {
-    await fetchHostEvent();
+  void _ensureOrganisationController(String orgId) {
+    if (Get.isRegistered<OrganisationController>()) {
+      final existing = Get.find<OrganisationController>();
+
+      // If it’s already for the same org, reuse it
+      if (existing.organisationId.trim() == orgId.trim()) return;
+
+      // Different org → replace
+      Get.delete<OrganisationController>(force: true);
+    }
+
+    Get.put(OrganisationController(orgId), permanent: true);
   }
 
-  /// Get the event ID if available
+  Future<void> refreshEvent() async => fetchHostEvent();
+
   String? get eventId => event.value?.eventId;
 
-  /// Check if host has an assigned event
   bool get hasEvent => event.value != null;
 }
